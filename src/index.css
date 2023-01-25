@@ -1,0 +1,201 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+nav a {
+  font-weight: 500;
+  color: #ddd;
+  text-decoration: inherit;
+}
+nav a:hover {
+  color: #d3d;
+}
+a {
+  text-decoration: none;
+  color: #000000;
+}
+.loading {
+  text-align: center;
+  padding: 5em;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #213547;
+  color: #ddd;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #b7c0d6;
+  color: #213547;
+  border-radius: 20px;
+}
+.buttons {
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+}
+nav {
+  display: flex;
+  padding: 1em;
+  gap: 2em;
+  background-color: #213547;
+}
+.center {
+  text-align: center;
+}
+
+li {
+  list-style: none;
+}
+
+.blog-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2em;
+  padding: 2em;
+  text-align: center;
+}
+
+.blog-card {
+  box-shadow: 1px 2px 2px #213547;
+  border: 4px solid;
+  border-image-source: linear-gradient(90deg, #213547ed, transparent);
+  border-image-slice: 1;
+  border-image-outset: 1;
+  transition: transform 0.1s ease-in-out;
+  will-change: transform;
+}
+
+.blog-card:hover {
+  background-color: #233646;
+  color: white;
+}
+
+.createForm {
+  padding: 20px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+input[type='text'],
+.createForm textarea {
+  width: 50%;
+  padding: 0.8em 1rem;
+  margin: 8px 0;
+  border: 3px solid #ccc;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+}
+
+.createForm > textarea {
+  height: 400px;
+  font-size: 1.2rem;
+}
+.commentForm {
+  margin-top: 10px;
+}
+.commentForm > textarea {
+  height: 100px;
+  width: 50%;
+  border: 3px solid #ccc;
+  outline: none;
+  padding: 0.8em 1rem;
+  transition: 0.5s;
+}
+input[type='text']:focus,
+textarea:focus {
+  border: 3px solid #233646;
+  box-shadow: 0 0 5px #233646;
+}
+
+form label,
+span {
+  display: block;
+}
+
+.error {
+  color: red;
+}
+.delete {
+  color: white;
+  background-color: rgb(165, 59, 40);
+}
+.delete:hover {
+  color: white;
+  background-color: rgb(219, 26, 26);
+}
+
+.singleblog {
+  padding: 2em;
+  font-size: 1.4rem;
+}
+
+.singleblog p {
+  padding: 20px;
+  margin: 0 auto;
+  width: 80%;
+}
+
+.comments-Container {
+  display: grid;
+  gap: 20px;
+}
+
+.comments {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 2em 1fr 2em;
+  padding: 1em;
+  box-shadow: 0 0 13px 0 rgb(39 37 37 / 13%);
+  border-radius: 20px;
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.X {
+  background-color: transparent;
+  color: rgb(241, 141, 141);
+  font-size: 1.2rem;
+  grid-column-end: -1;
+}
+.X:hover {
+  background-color: transparent;
+  color: red;
+}
+
+.time {
+  font-size: 0.8rem;
+  margin-top: 2rem;
+  text-align: center;
+  grid-column: 2 / 3;
+}
+.user {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: start;
+  font-weight: bold;
+  grid-column: 1 / 2;
+}
+.content {
+  grid-column: 1/4;
+  grid-row: 2/2;
+}
+.flexItems {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  justify-content: space-around;
+}
