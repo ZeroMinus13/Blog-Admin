@@ -62,11 +62,12 @@ li {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2em;
-  padding: 2em;
+  padding: 5em;
   text-align: center;
 }
 
 .blog-card {
+  min-height: 170px;
   box-shadow: 1px 2px 2px #213547;
   border: 4px solid;
   border-image-source: linear-gradient(90deg, #213547ed, transparent);
@@ -80,7 +81,10 @@ li {
   background-color: #233646;
   color: white;
 }
-
+label {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
 .createForm {
   padding: 20px;
   margin: 0 auto;
@@ -89,7 +93,8 @@ li {
 }
 
 input[type='text'],
-.createForm textarea {
+.createForm textarea,
+input[type='password'] {
   width: 50%;
   padding: 0.8em 1rem;
   margin: 8px 0;
@@ -115,7 +120,8 @@ input[type='text'],
   transition: 0.5s;
 }
 input[type='text']:focus,
-textarea:focus {
+textarea:focus,
+input[type='password']:focus {
   border: 3px solid #233646;
   box-shadow: 0 0 5px #233646;
 }
@@ -157,30 +163,33 @@ span {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 2em 1fr 2em;
-  padding: 1em;
-  box-shadow: 0 0 13px 0 rgb(39 37 37 / 13%);
+  padding: 0.7em;
+  border: 1px solid darkblue;
   border-radius: 20px;
-  width: 50%;
   margin: 0 auto;
+  max-width: 80vw;
   text-align: center;
 }
 
 .X {
   background-color: transparent;
   color: rgb(241, 141, 141);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   grid-column-end: -1;
 }
+
 .X:hover {
   background-color: transparent;
   color: red;
+  animation: scale-up 0.5s ease-in-out forwards;
 }
 
 .time {
   font-size: 0.8rem;
-  margin-top: 2rem;
   text-align: center;
+  font-style: italic;
   grid-column: 2 / 3;
+  padding: 1em;
 }
 .user {
   display: flex;
@@ -198,4 +207,13 @@ span {
   display: grid;
   grid-template-columns: 1fr 30px;
   justify-content: space-around;
+}
+
+@keyframes scale-up {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
 }

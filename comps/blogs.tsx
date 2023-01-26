@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-function BlogContent() {
+function BlogContent({ userName }: { userName: string }) {
   const [data, setData] = useState<Data[] | null>(null);
   const [error, setError] = useState(null);
 
@@ -10,7 +10,12 @@ function BlogContent() {
     let ignore = false;
     async function fetchData() {
       try {
-        const url = await fetch('http://localhost:3000/');
+        const url = await fetch('http://localhost:3000/', {
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         const data = await url.json();
         if (!ignore) {
           setData(data);
@@ -24,28 +29,31 @@ function BlogContent() {
       ignore = true;
     };
   }, []);
+  console.log(userName);
 
   return data ? (
-    <div className="blog-container">
-      {data.map((blog) => (
-        <Link to={blog._id} key={blog._id}>
-          <div className="blog-card">
-            <h2>{blog.title}</h2>
-            <p>{blog.content.substring(0, 200)}...</p>
-            <p>
-              {new Date(blog.createdAt).toLocaleDateString('en-gb', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true,
-              })}
-            </p>
-          </div>
-        </Link>
-      ))}
-    </div>
+    <>
+      <div className="blog-container">
+        {data.map((blog) => (
+          <Link to={blog._id} key={blog._id}>
+            <div className="blog-card">
+              <h2>{blog.title}</h2>
+              <p>{blog.content.substring(0, 200)}...</p>
+              <p>
+                {new Date(blog.createdAt).toLocaleDateString('en-gb', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true,
+                })}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </>
   ) : (
     <h1 className="loading">Loading...</h1>
   );

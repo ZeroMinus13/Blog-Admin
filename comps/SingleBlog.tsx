@@ -1,12 +1,15 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Comment from './comment';
 
-function SingleBlog() {
+function SingleBlog({ jwtToken }: { jwtToken: string }) {
   const [data, setData] = useState<Data | null>(null);
-  const [comment, setComment] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+  const [comment, setComment] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({ title: '', content: '' });
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -18,6 +21,8 @@ function SingleBlog() {
         const data = await url.json();
         if (!ignore) {
           setData(data);
+          setFormData(data);
+          setLoading(false);
         }
       } catch (err) {
         console.log(err);
@@ -27,12 +32,16 @@ function SingleBlog() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [comment]);
 
   async function deleteBlog() {
     try {
       const data = await fetch(`http://localhost:3000/${id}/deleteblog`, {
         method: 'Delete',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`,
+        },
       });
       if (data.ok) {
         navigate('/');
@@ -44,12 +53,18 @@ function SingleBlog() {
 
   async function updateBlog(ids: string) {
     try {
-      console.log(ids);
-      const data = await fetch(`http://localhost:3000/${id}/updateBlog`, {
+      const data = await fetch(`http://localhost:3000/${ids}/updateBlog`, {
         method: 'Put',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`,
+        },
+        body: JSON.stringify(formData),
       });
+      setIsEditing(false);
     } catch (err) {
       console.log(err);
+      setIsEditing(false);
     }
   }
 
@@ -57,35 +72,21 @@ function SingleBlog() {
     try {
       const data = await fetch(`http://localhost:3000/comments/${ids}/delete`, {
         method: 'Delete',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`,
+        },
       });
+      if (data.ok) {
+        setComment(() => !comment);
+      }
     } catch (err) {
       console.log(err);
     }
   }
 
-  return data ? (
-    <div className="center singleblog">
-      <h2>{data.title}</h2>
-      <p>{data.content}</p>
-      <p>
-        {new Date(data.createdAt).toLocaleDateString('en-gb', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        })}
-      </p>
-      <div className="buttons">
-        <button onClick={deleteBlog} className="delete">
-          Delete
-        </button>
-        <button>Edit</button>
-      </div>
-
-      <p>Comments</p>
-
+  const AllComments = (data: Data) => {
+    return (
       <div className="comments-Container">
         {data.comments.map((comm) => (
           <ul key={uuidv4()} className="comments">
@@ -107,10 +108,63 @@ function SingleBlog() {
           </ul>
         ))}
       </div>
-      <Comment id={data._id} />
+    );
+  };
+
+  return isLoading ? (
+    <h1 className="loading">Loading...</h1>
+  ) : data && !isEditing ? (
+    <div className="center singleblog">
+      <h2>{data.title}</h2>
+      <p>{data.content}</p>
+      <p>
+        {new Date(data.createdAt).toLocaleDateString('en-gb', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        })}
+      </p>
+      <div className="buttons">
+        <button onClick={deleteBlog} className="delete">
+          Delete
+        </button>
+        <button onClick={(e) => setIsEditing(!isEditing)}>Edit</button>
+      </div>
+
+      <p>Comments</p>
+      <AllComments {...data} />
+      <Comment id={data._id} setComment={setComment} comment={comment} />
     </div>
   ) : (
-    <h1 className="center">Loading...</h1>
+    <form
+      className="createForm"
+      onSubmit={() => {
+        if (typeof id === 'string') {
+          updateBlog(id);
+        }
+      }}
+    >
+      <label htmlFor="title">Title</label>
+      <input
+        type="text"
+        value={formData.title}
+        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+      />
+      <label htmlFor="content">Content</label>
+      <textarea
+        value={formData.content}
+        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+      />
+      <div className="buttons">
+        <button type="submit">Save</button>
+        <button type="button" onClick={() => setIsEditing(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }
 

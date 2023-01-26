@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function Comment({ id }: { id: string }) {
+function Comment({
+  id,
+  setComment,
+  comment,
+}: {
+  id: string;
+  setComment: React.Dispatch<React.SetStateAction<boolean>>;
+  comment: boolean;
+}) {
   const [formData, setFormData] = useState({ username: '', content: '' });
   const [error, setError] = useState('');
 
@@ -17,6 +24,7 @@ function Comment({ id }: { id: string }) {
       });
       if (response.ok) {
         setFormData({ username: '', content: '' });
+        setComment(() => !comment);
       }
     } catch (err) {
       setError('Error occurred in database please try again later!');
@@ -26,7 +34,7 @@ function Comment({ id }: { id: string }) {
   return (
     <>
       <form method="POST" onSubmit={submitData} className="commentForm">
-        <label htmlFor="username">Username</label>
+        <label htmlFor="username">Username*</label>
         <span className="error">{error}</span>
         <input
           type="text"
@@ -36,12 +44,12 @@ function Comment({ id }: { id: string }) {
           placeholder="Username"
         />
 
-        <label htmlFor="content">Content</label>
+        <label htmlFor="content">Comment*</label>
         <textarea
           name="content"
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
           value={formData.content}
-          placeholder="Content"
+          placeholder="Comment"
         />
         <br />
         <button>Send</button>
