@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid'
 
-function BlogContent({ userName }: { userName: string }) {
-  const [data, setData] = useState<Data[] | null>(null);
-  const [error, setError] = useState(null);
+function Blogs() {
+  const [data, setData] = useState<Data[] | null>(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    let ignore = false;
+    let ignore = false
     async function fetchData() {
       try {
         const url = await fetch('http://localhost:3000/', {
@@ -15,28 +15,27 @@ function BlogContent({ userName }: { userName: string }) {
           headers: {
             'Content-Type': 'application/json',
           },
-        });
-        const data = await url.json();
+        })
+        const data = await url.json()
         if (!ignore) {
-          setData(data);
+          setData(data)
         }
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     }
-    fetchData();
+    fetchData()
     return () => {
-      ignore = true;
-    };
-  }, []);
-  console.log(userName);
+      ignore = true
+    }
+  }, [])
 
   return data ? (
     <>
-      <div className="blog-container">
+      <div className='blog-container'>
         {data.map((blog) => (
           <Link to={blog._id} key={blog._id}>
-            <div className="blog-card">
+            <div className='blog-card'>
               <h2>{blog.title}</h2>
               <p>{blog.content.substring(0, 200)}...</p>
               <p>
@@ -55,16 +54,16 @@ function BlogContent({ userName }: { userName: string }) {
       </div>
     </>
   ) : (
-    <h1 className="loading">Loading...</h1>
-  );
+    <h1 className='loading'>Loading...</h1>
+  )
 }
 
 interface Data {
-  _id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  comments: [];
+  _id: string
+  title: string
+  content: string
+  createdAt: Date
+  comments: []
 }
 
-export default BlogContent;
+export default Blogs

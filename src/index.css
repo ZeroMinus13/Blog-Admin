@@ -6,13 +6,25 @@
   padding: 0;
   box-sizing: border-box;
 }
+nav {
+  display: flex;
+  padding: 1em;
+  gap: 2em;
+  justify-content: space-around;
+  background-color: #213547;
+}
 nav a {
   font-weight: 500;
   color: #ddd;
   text-decoration: inherit;
+  text-align: center;
 }
 nav a:hover {
-  color: #d3d;
+  color: rgb(107, 165, 240);
+}
+.userName {
+  color: rgb(83, 236, 216);
+  font-size: large;
 }
 a {
   text-decoration: none;
@@ -44,12 +56,7 @@ button:hover {
   gap: 2em;
   justify-content: center;
 }
-nav {
-  display: flex;
-  padding: 1em;
-  gap: 2em;
-  background-color: #213547;
-}
+
 .center {
   text-align: center;
 }

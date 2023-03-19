@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateAction<string>> }) {
-  const [formData, setFormData] = useState({ username: '', password: '' });
-  let navigate = useNavigate();
+function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateAction<null>> }) {
+  const [formData, setFormData] = useState({ username: '', password: '' })
+  const [error, setError] = useState<null | string>(null)
+  let navigate = useNavigate()
 
   async function submitData(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -15,44 +16,48 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
         },
         credentials: 'include',
         body: JSON.stringify(formData),
-      });
+      })
+
       if (response.ok) {
-        const res = await response.json();
-        const jwt = response.headers.get('Set-Cookie')!;
-        document.cookie = jwt;
-        setUserName(res.user);
-        navigate('/');
+        const res = await response.json()
+        localStorage.setItem('user', JSON.stringify(res))
+        setUserName(res.user)
+        navigate('/')
+      } else {
+        const errorResponse = await response.json()
+        setError(errorResponse.error)
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error)
     }
   }
   return (
     <>
-      <form method="POST" onSubmit={submitData} className="commentForm center">
-        <label htmlFor="username">Username*</label>
+      <form method='POST' onSubmit={submitData} className='createForm loading'>
+        <span className='error'>{error}</span>
+        <label htmlFor='username'>Username</label>
         <input
-          type="text"
-          name="username"
+          type='text'
+          name='username'
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           value={formData.username}
-          placeholder="Username"
+          placeholder='Username'
         />
 
-        <label htmlFor="content">Comment*</label>
+        <label htmlFor='content'>Password</label>
         <input
-          type="password"
-          name="content"
+          type='password'
+          name='content'
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           value={formData.password}
-          placeholder="Comment"
-          autoComplete="password"
+          placeholder='Comment'
+          autoComplete='password'
         />
         <br />
         <button>Send</button>
       </form>
     </>
-  );
+  )
 }
 
-export default Login;
+export default Login

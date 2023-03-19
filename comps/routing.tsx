@@ -1,43 +1,63 @@
-import { Route, Routes, Link } from 'react-router-dom';
-import BlogContent from './blogs';
-import Blogcreate from './blogcreate';
-import SingleBlog from './SingleBlog';
-import Login from './Login';
-import Signup from './signup';
-import { useState } from 'react';
+import { Route, Routes, Link } from 'react-router-dom'
+import Blogs from './blogs'
+import Blogcreate from './blogcreate'
+import SingleBlog from './SingleBlog'
+import Login from './login'
+import Signup from './signup'
+import { useState, useEffect } from 'react'
 
+const User = ({ userName }: { userName: string | null }) => {
+  return !userName ? (
+    <>
+      <Link to='/login'>Log In</Link>
+      <Link to='/signup'>Sign up</Link>
+    </>
+  ) : (
+    <>
+      <p className='userName'> {userName.charAt(0).toUpperCase().concat(userName.slice(1))} </p>
+      <Link to='/' onClick={() => signOut()}>
+        Sign Out
+      </Link>
+    </>
+  )
+}
 function RouteComponent() {
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(null)
+  const [token, setToken] = useState<string | null>(null)
+  useEffect(() => {
+    let loggedUser = localStorage.getItem('user')
+    if (loggedUser) {
+      let user = JSON.parse(loggedUser)
+      setToken(user.token)
+      setUserName(user.user)
+    }
+  })
   function Navbar() {
     return (
       <nav>
-        <Link to="/">Random Blogs</Link>
-        <Link to="/createBlog">Create a new Blog</Link>
-        <Link to="/login">Log In</Link>
-        <Link to="/signup">Sign up</Link>
+        <Link to='/'>Blogs</Link>
+        <Link to='/createBlog'>Create a new Blog</Link>
+        <User userName={userName} />
       </nav>
-    );
+    )
   }
 
   return (
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<BlogContent userName={userName} />} />
-        <Route path="/createBlog" element={<Blogcreate jwtToken={jwtToken} />} />
-        <Route path="/:id" element={<SingleBlog jwtToken={jwtToken} />} />
-        <Route path="/:id/edit" element={<Blogcreate jwtToken={jwtToken} />} />
-        <Route path="/login" element={<Login setUserName={setUserName} />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path='/' element={<Blogs />} />
+        <Route path='/createBlog' element={<Blogcreate token={token} />} />
+        <Route path='/:id' element={<SingleBlog token={token} />} />
+        <Route path='/:id/edit' element={<Blogcreate token={token} />} />
+        <Route path='/login' element={<Login setUserName={setUserName} />} />
+        <Route path='/signup' element={<Signup />} />
       </Routes>
     </>
-  );
+  )
 }
-function getCookie(name: string) {
-  const value = '; ' + document.cookie;
-  const parts = value.split('; ' + name + '=');
-  return parts[1];
+function signOut() {
+  localStorage.removeItem('user')
+  location.reload()
 }
-const jwtToken = getCookie('jwt');
-
-export default RouteComponent;
+export default RouteComponent
