@@ -1,12 +1,17 @@
-import { Route, Routes, Link } from 'react-router-dom'
-import Blogs from './blogs'
-import Blogcreate from './blogcreate'
-import SingleBlog from './SingleBlog'
-import Login from './login'
-import Signup from './signup'
-import { useState, useEffect } from 'react'
+import { Route, Routes, Link } from 'react-router-dom';
+import Blogs from './blogs';
+import Blogcreate from './blogcreate';
+import SingleBlog from './SingleBlog';
+import Login from './login';
+import Signup from './signup';
+import { useState, useEffect } from 'react';
 
 const User = ({ userName }: { userName: string | null }) => {
+  function signOut() {
+    localStorage.removeItem('user');
+    location.reload();
+  }
+
   return !userName ? (
     <>
       <Link to='/login'>Log In</Link>
@@ -19,32 +24,29 @@ const User = ({ userName }: { userName: string | null }) => {
         Sign Out
       </Link>
     </>
-  )
-}
+  );
+};
+
 function RouteComponent() {
-  const [userName, setUserName] = useState(null)
-  const [token, setToken] = useState<string | null>(null)
+  const [userName, setUserName] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
-    let loggedUser = localStorage.getItem('user')
+    let loggedUser = localStorage.getItem('user');
     if (loggedUser) {
-      let user = JSON.parse(loggedUser)
-      setToken(user.token)
-      setUserName(user.user)
+      let user = JSON.parse(loggedUser);
+      setToken(user.token);
+      setUserName(user.user);
     }
-  })
-  function Navbar() {
-    return (
-      <nav>
-        <Link to='/'>Blogs</Link>
-        <Link to='/createBlog'>Create a new Blog</Link>
-        <User userName={userName} />
-      </nav>
-    )
-  }
+  });
 
   return (
-    <>
-      <Navbar />
+    <div>
+      <nav>
+        <Link to='/'>Blogs</Link>
+        <Link to='/createBlog'>New Blog</Link>
+        <User userName={userName} />
+      </nav>
       <Routes>
         <Route path='/' element={<Blogs />} />
         <Route path='/createBlog' element={<Blogcreate token={token} />} />
@@ -53,11 +55,8 @@ function RouteComponent() {
         <Route path='/login' element={<Login setUserName={setUserName} />} />
         <Route path='/signup' element={<Signup />} />
       </Routes>
-    </>
-  )
+    </div>
+  );
 }
-function signOut() {
-  localStorage.removeItem('user')
-  location.reload()
-}
-export default RouteComponent
+
+export default RouteComponent;

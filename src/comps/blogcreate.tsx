@@ -1,31 +1,31 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Blogcreate({ token }: { token: string | null }) {
-  const [formData, setFormData] = useState({ title: '', content: '' })
-  const [error, setError] = useState('')
-  let navigate = useNavigate()
+  const [formData, setFormData] = useState({ title: '', content: '' });
+  const [error, setError] = useState('');
+  let navigate = useNavigate();
 
   async function submitData(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/', {
+      const response = await fetch('https://blog-backend-production-8b95.up.railway.app/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
-      })
+      });
       if (response.ok) {
-        navigate('/')
+        navigate('/');
       } else {
-        const errorResponse = await response.json()
-        setError(errorResponse.error)
+        const errorResponse = await response.json();
+        setError(errorResponse.error);
       }
     } catch (err) {
-      console.log(err)
-      setError('Error Occurred')
+      console.log(err);
+      setError('Error Occurred');
     }
   }
 
@@ -36,7 +36,7 @@ function Blogcreate({ token }: { token: string | null }) {
         <label htmlFor='title'>Title</label>
         <input
           type='text'
-          name='title'
+          id='title'
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           value={formData.title}
           placeholder='Title'
@@ -44,7 +44,7 @@ function Blogcreate({ token }: { token: string | null }) {
 
         <label htmlFor='content'>Content</label>
         <textarea
-          name='content'
+          id='content'
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
           value={formData.content}
           placeholder='Content'
@@ -53,7 +53,7 @@ function Blogcreate({ token }: { token: string | null }) {
         <button>Submit</button>
       </form>
     </>
-  )
+  );
 }
 
-export default Blogcreate
+export default Blogcreate;

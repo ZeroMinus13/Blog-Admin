@@ -1,29 +1,29 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Signup() {
-  const [admin, setAdmin] = useState({ username: '', password: '' })
-  const [error, setError] = useState<null | string>(null)
-  const navigate = useNavigate()
+  const [admin, setAdmin] = useState({ username: '', password: '' });
+  const [error, setError] = useState<null | string>(null);
+  const navigate = useNavigate();
 
   async function admincreated(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/createAdmin', {
+      const response = await fetch('https://blog-backend-production-8b95.up.railway.app/createAdmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(admin),
-      })
+      });
       if (response.ok) {
-        navigate('/')
+        navigate('/');
       } else {
-        const errorRes = await response.json()
-        setError(errorRes.error)
+        const errorRes = await response.json();
+        setError(errorRes.error);
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   }
 
@@ -33,7 +33,7 @@ function Signup() {
       <label htmlFor='admin'>Username*</label>
       <input
         type='text'
-        name='admin'
+        id='admin'
         onChange={(e) => setAdmin({ ...admin, username: e.target.value })}
         value={admin.username.toLowerCase()}
         placeholder='Admin'
@@ -42,7 +42,7 @@ function Signup() {
       <label htmlFor='password'>Password*</label>
       <input
         type='password'
-        name='password'
+        id='password'
         onChange={(e) => setAdmin({ ...admin, password: e.target.value })}
         value={admin.password.toLowerCase()}
         placeholder='Password'
@@ -50,7 +50,7 @@ function Signup() {
       <br />
       <button>Submit</button>
     </form>
-  )
+  );
 }
 
-export default Signup
+export default Signup;
