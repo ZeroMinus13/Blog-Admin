@@ -4,20 +4,20 @@ import { createComment } from '../api/api';
 
 function Comment({ id }: { id: string }) {
   const [formdata, setFormData] = useState({ username: '', content: '' });
+  const [errorM, setErrorM] = useState('');
   const queryClient = useQueryClient();
 
-  const { mutate, isLoading, isError, error } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: () => createComment(formdata, id),
-    onSuccess: (data, variables, context) => {
-      console.log(data, variables, context);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogID', id] });
       setFormData({ username: '', content: '' });
     },
+    onError: (error) => {
+      setErrorM(error instanceof Error ? 'Error: ' + error.message : 'An error occurred');
+    },
   });
 
-  if (isError) {
-    console.log(error instanceof Error ? error.message : '');
-  }
   return (
     <>
       <form
@@ -28,9 +28,7 @@ function Comment({ id }: { id: string }) {
           mutate();
         }}
       >
-        {isError && (
-          <span className='error'>Error: {error instanceof Error ? error.message : 'An error occurred'}</span>
-        )}
+        {<span className='error'>{errorM}</span>}
         <label htmlFor='username'>Name*</label>
         <input
           type='text'
@@ -40,7 +38,6 @@ function Comment({ id }: { id: string }) {
           placeholder='Name'
           required
         />
-
         <label htmlFor='content'>Comment*</label>
         <textarea
           id='content'
@@ -50,7 +47,7 @@ function Comment({ id }: { id: string }) {
           required
         />
         <br />
-        <button type='submit' disabled={isLoading}>
+        <button type='submit' disabled={isLoading} style={{ marginBottom: '5px' }}>
           {isLoading ? 'Sending...' : 'Send'}
         </button>
       </form>

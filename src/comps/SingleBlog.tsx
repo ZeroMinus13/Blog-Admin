@@ -1,13 +1,14 @@
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import Comment from './comment';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { deleteBlog, updateBlog, deleteComment } from '../api/api';
+import AllComments from './Allcomments';
 
 function SingleBlog({ token }: { token: string | null }) {
-  const [comment, setComment] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [errorM, setErrorM] = useState('');
   const [formData, setFormData] = useState({ title: '', content: '' });
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,90 +19,46 @@ function SingleBlog({ token }: { token: string | null }) {
     queryFn: async () => (await fetch(`https://blog-backend-production-8b95.up.railway.app/${id}`)).json(),
   });
 
-  // const mutation = useMutation({
-  //   mutationFn: addTodo,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['todos'] });
-  //     queryClient.invalidateQueries({ queryKey: ['reminders'] });
-  //   },
-  // });
+  const deleteblog = useMutation({
+    mutationFn: () => deleteBlog(id || '', token || ''),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogID', id] });
+      navigate('/');
+    },
+  });
 
-  async function deleteBlog() {
-    try {
-      const data = await fetch(`https://blog-backend-production-8b95.up.railway.app/${id}/deleteblog`, {
-        method: 'Delete',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+  const updateblog = useMutation({
+    mutationFn: () => updateBlog(id || '', token || '', formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogID', id] });
+      navigate('/');
+    },
+    onError: (err) => {
+      setErrorM(err instanceof Error ? 'Error: ' + err.message : 'An error occurred');
+    },
+  });
+
+  const deletecomment = useMutation({
+    mutationFn: (comId: string) => deleteComment(comId, token || ''),
+    onMutate: (comId: string) => {
+      queryClient.setQueryData(['blogID', id], (prevData: any) => {
+        if (prevData && prevData.comments) {
+          return {
+            ...prevData,
+            comments: prevData.comments.filter((comment: any) => comment._id !== comId),
+          };
+        }
+        return prevData;
       });
-      if (data.ok) {
-        navigate('/');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  async function updateBlog(ids: string) {
-    await fetch(`https://blog-backend-production-8b95.up.railway.app/${ids}/updateBlog`, {
-      method: 'Put',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    });
-    setIsEditing(false);
-  }
-
-  async function deleteComment(ids: string) {
-    try {
-      const data = await fetch(`https://blog-backend-production-8b95.up.railway.app/comments/${ids}/delete`, {
-        method: 'Delete',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (data.ok) {
-        setComment(() => !comment);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const AllComments = (data: Data) => {
-    const sortedComments = data.comments.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    return (
-      <div className='comments-Container'>
-        {sortedComments.map((com) => (
-          <ul key={com._id} className='comments'>
-            <li className='user'>{com.username}</li>
-            {token && (
-              <button onClick={(e) => deleteComment(com._id)} className='X'>
-                {'\u274C'}
-              </button>
-            )}
-            <li className='content'>{com.content}</li>
-            <li className='time'>
-              {new Date(com.createdAt).toLocaleDateString('en-gb', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true,
-              })}
-            </li>
-          </ul>
-        ))}
-      </div>
-    );
-  };
+      return queryClient.getQueryData(['blogID', id]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogID', id] });
+    },
+    onError: (rollbackData) => {
+      queryClient.setQueryData(['blogID', id], rollbackData);
+    },
+  });
 
   if (isLoading) return <span className='loading'>Loading...</span>;
   if (isError) {
@@ -124,7 +81,7 @@ function SingleBlog({ token }: { token: string | null }) {
       </p>
       {token && (
         <div className='buttons'>
-          <button onClick={deleteBlog} className='delete'>
+          <button onClick={() => deleteblog.mutate()} className='delete'>
             Delete
           </button>
           <button onClick={(e) => setIsEditing(!isEditing)}>Edit</button>
@@ -133,17 +90,16 @@ function SingleBlog({ token }: { token: string | null }) {
 
       <p>Comments</p>
       <Comment id={data._id} />
-      <AllComments {...data} />
+      <AllComments data={data} token={token} deletecomment={deletecomment.mutate} />
     </div>
   ) : (
     <form
       className='createForm'
-      onSubmit={() => {
-        if (typeof id === 'string') {
-          updateBlog(id);
-        }
+      onSubmit={(e) => {
+        e.preventDefault(), updateblog.mutate();
       }}
     >
+      <span className='error'>{errorM}</span>
       <label htmlFor='title'>Title</label>
       <input
         type='text'
@@ -161,14 +117,6 @@ function SingleBlog({ token }: { token: string | null }) {
       </div>
     </form>
   );
-}
-
-interface Data {
-  _id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  comments: Array<{ _id: string; username: string; content: string; createdAt: Date }>;
 }
 
 export default SingleBlog;
