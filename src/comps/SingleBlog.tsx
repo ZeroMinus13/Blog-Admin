@@ -14,7 +14,7 @@ function SingleBlog({ token }: { token: string | null }) {
   const queryClient = useQueryClient();
 
   const { isLoading, isError, data, error } = useQuery({
-    queryKey: ['blogID'],
+    queryKey: ['blogID', id],
     queryFn: async () => (await fetch(`https://blog-backend-production-8b95.up.railway.app/${id}`)).json(),
   });
 
@@ -73,19 +73,22 @@ function SingleBlog({ token }: { token: string | null }) {
   }
 
   const AllComments = (data: Data) => {
+    const sortedComments = data.comments.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
     return (
       <div className='comments-Container'>
-        {data.comments.map((comm) => (
-          <ul key={uuidv4()} className='comments'>
-            <li className='user'>{comm.username}</li>
+        {sortedComments.map((com) => (
+          <ul key={com._id} className='comments'>
+            <li className='user'>{com.username}</li>
             {token && (
-              <button onClick={(e) => deleteComment(comm._id)} className='X'>
+              <button onClick={(e) => deleteComment(com._id)} className='X'>
                 {'\u274C'}
               </button>
             )}
-            <li className='content'>{comm.content}</li>
+            <li className='content'>{com.content}</li>
             <li className='time'>
-              {new Date(comm.createdAt).toLocaleDateString('en-gb', {
+              {new Date(com.createdAt).toLocaleDateString('en-gb', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -101,7 +104,9 @@ function SingleBlog({ token }: { token: string | null }) {
   };
 
   if (isLoading) return <span className='loading'>Loading...</span>;
-  if (isError) return <span>Error: {error as string}</span>;
+  if (isError) {
+    return <span className='loading'>Error: {error instanceof Error ? error.message : 'An error occurred'}</span>;
+  }
 
   return data && !isEditing ? (
     <div className='center singleblog'>
@@ -127,8 +132,8 @@ function SingleBlog({ token }: { token: string | null }) {
       )}
 
       <p>Comments</p>
+      <Comment id={data._id} />
       <AllComments {...data} />
-      <Comment id={data._id} setComment={setComment} comment={comment} />
     </div>
   ) : (
     <form

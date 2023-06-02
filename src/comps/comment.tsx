@@ -1,49 +1,44 @@
-import React, { useState } from 'react';
-import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
-type commentProps = {
-  id: string;
-  setComment: React.Dispatch<React.SetStateAction<boolean>>;
-  comment: boolean;
-};
+import { useState } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { createComment } from '../api/api';
 
-function Comment({ id, setComment, comment }: commentProps) {
+function Comment({ id }: { id: string }) {
   const [formdata, setFormData] = useState({ username: '', content: '' });
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<void, Error, typeof formdata>(
-    async (formData) => {
-      await fetch(`https://blog-backend-production-8b95.up.railway.app/comments/${id}/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: formData.username, content: formData.content, _id: id }),
-      });
+  const { mutate, isLoading, isError, error } = useMutation({
+    mutationFn: () => createComment(formdata, id),
+    onSuccess: (data, variables, context) => {
+      console.log(data, variables, context);
+      queryClient.invalidateQueries({ queryKey: ['blogID', id] });
+      setFormData({ username: '', content: '' });
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['blogID'] });
-        setFormData({ username: '', content: '' });
-        setComment(() => !comment);
-      },
-    }
-  );
+  });
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    mutation.mutate(formdata);
+  if (isError) {
+    console.log(error instanceof Error ? error.message : '');
   }
   return (
     <>
-      <form method='POST' className='commentForm'>
-        {/* <span className='error'>{error}</span> */}
-        <label htmlFor='username'>Username*</label>
+      <form
+        method='POST'
+        className='commentForm'
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutate();
+        }}
+      >
+        {isError && (
+          <span className='error'>Error: {error instanceof Error ? error.message : 'An error occurred'}</span>
+        )}
+        <label htmlFor='username'>Name*</label>
         <input
           type='text'
           id='username'
           onChange={(e) => setFormData({ ...formdata, username: e.target.value })}
           value={formdata.username}
-          placeholder='Username'
+          placeholder='Name'
+          required
         />
 
         <label htmlFor='content'>Comment*</label>
@@ -52,10 +47,11 @@ function Comment({ id, setComment, comment }: commentProps) {
           onChange={(e) => setFormData({ ...formdata, content: e.target.value })}
           value={formdata.content}
           placeholder='Comment'
+          required
         />
         <br />
-        <button type='submit' onClick={(e) => handleSubmit(e)}>
-          Send
+        <button type='submit' disabled={isLoading}>
+          {isLoading ? 'Sending...' : 'Send'}
         </button>
       </form>
     </>
