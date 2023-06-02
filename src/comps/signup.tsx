@@ -1,34 +1,29 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useMutation } from '@tanstack/react-query';
+import { createAdmin } from '../api/api';
 function Signup() {
   const [admin, setAdmin] = useState({ username: '', password: '' });
   const [error, setError] = useState<null | string>(null);
   const navigate = useNavigate();
 
-  async function admincreated(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    try {
-      const response = await fetch('https://blog-backend-production-8b95.up.railway.app/createAdmin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(admin),
-      });
-      if (response.ok) {
-        navigate('/');
-      } else {
-        const errorRes = await response.json();
-        setError(errorRes.error);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  const { mutate } = useMutation({
+    mutationFn: () => createAdmin(admin),
+    onSuccess: () => {
+      navigate('/');
+    },
+    onError: (error) => setError(error instanceof Error ? error.message : 'Something went wrong'),
+  });
 
   return (
-    <form method='POST' onSubmit={admincreated} className='createForm loading' autoComplete='off'>
+    <form
+      method='POST'
+      onSubmit={(e) => {
+        e.preventDefault(), mutate();
+      }}
+      className='createForm loading'
+      autoComplete='off'
+    >
       <span className='error'>{error}</span>
       <label htmlFor='admin'>Username*</label>
       <input
@@ -36,7 +31,9 @@ function Signup() {
         id='admin'
         onChange={(e) => setAdmin({ ...admin, username: e.target.value })}
         value={admin.username.toLowerCase()}
-        placeholder='Admin'
+        placeholder='Admin Username'
+        required
+        minLength={3}
       />
 
       <label htmlFor='password'>Password*</label>
@@ -46,6 +43,8 @@ function Signup() {
         onChange={(e) => setAdmin({ ...admin, password: e.target.value })}
         value={admin.password.toLowerCase()}
         placeholder='Password'
+        required
+        minLength={3}
       />
       <br />
       <button>Submit</button>

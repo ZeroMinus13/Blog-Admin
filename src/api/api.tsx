@@ -62,4 +62,32 @@ async function deleteComment(id: string, token: string): Promise<void> {
     },
   });
 }
-export { createComment, deleteBlog, updateBlog, deleteComment };
+
+async function signIn(formData: { username: string; password: string }) {
+  const response = await fetch(url + 'login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(formData),
+  });
+  if (response.ok) {
+    const res = await response.json();
+    localStorage.setItem('user', JSON.stringify(res));
+  }
+  if (!response.ok) {
+    await error(response);
+  }
+}
+
+async function createAdmin(formData: { username: string; password: string }) {
+  const response = await fetch('https://blog-backend-production-8b95.up.railway.app/createAdmin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+}
+export { createComment, deleteBlog, updateBlog, deleteComment, signIn, createAdmin };

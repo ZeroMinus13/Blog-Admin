@@ -1,39 +1,34 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useMutation } from '@tanstack/react-query';
+import { signIn } from '../api/api';
 function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateAction<null>> }) {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState<null | string>(null);
   let navigate = useNavigate();
 
-  async function submitData(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    try {
-      const response = await fetch('https://blog-backend-production-8b95.up.railway.app/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const res = await response.json();
-        localStorage.setItem('user', JSON.stringify(res));
-        setUserName(res.user);
+  const { mutate } = useMutation({
+    mutationFn: () => signIn(formData),
+    onSuccess: () => {
+      let userData = localStorage.getItem('user');
+      if (userData) {
+        let user = JSON.parse(userData);
+        setUserName(user.user);
         navigate('/');
-      } else {
-        const errorResponse = await response.json();
-        setError(errorResponse.error);
       }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    },
+    onError: (error) => setError(error instanceof Error ? error.message : 'Something went wrong'),
+  });
+
   return (
     <>
-      <form method='POST' onSubmit={submitData} className='createForm loading'>
+      <form
+        method='POST'
+        onSubmit={(e) => {
+          e.preventDefault(), mutate();
+        }}
+        className='createForm loading'
+      >
         <span className='error'>{error}</span>
         <label htmlFor='username'>Username</label>
         <input
