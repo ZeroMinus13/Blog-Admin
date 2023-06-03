@@ -64,6 +64,9 @@ async function deleteComment(id: string, token: string): Promise<void> {
 }
 
 async function signIn(formData: { username: string; password: string }) {
+  if (formData.username.length < 3 || formData.password.length < 3) {
+    throw new Error('Username and password must be at least 3 characters long.');
+  }
   const response = await fetch(url + 'login', {
     method: 'POST',
     headers: {
