@@ -6,7 +6,7 @@ import CustomAni from '../ani/framer';
 function Blogs() {
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ['blogs'],
-    queryFn: async () => (await fetch('https://blog-backend-production-8b95.up.railway.app')).json(),
+    queryFn: async () => (await fetch('https://blog-backend-production-8b95.up.railway.app', { mode: 'cors' })).json(),
   });
 
   if (isLoading) return <span className='loading'>Loading...</span>;
