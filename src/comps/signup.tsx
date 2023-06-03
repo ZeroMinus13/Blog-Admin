@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { createAdmin } from '../api/api';
+import { motion as m } from 'framer-motion';
+import CustomAni from '../ani/framer';
+
 function Signup() {
   const [admin, setAdmin] = useState({ username: '', password: '' });
   const [error, setError] = useState<null | string>(null);
@@ -16,13 +19,17 @@ function Signup() {
   });
 
   return (
-    <form
+    <m.form
       method='POST'
       onSubmit={(e) => {
         e.preventDefault(), mutate();
       }}
       className='createForm loading'
       autoComplete='off'
+      variants={CustomAni}
+      initial='initial'
+      animate='show'
+      exit='exit'
     >
       <span className='error'>{error}</span>
       <label htmlFor='admin'>Username*</label>
@@ -48,7 +55,7 @@ function Signup() {
       />
       <br />
       <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
-    </form>
+    </m.form>
   );
 }
 

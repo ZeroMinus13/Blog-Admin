@@ -5,6 +5,7 @@ import Comment from './comment';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { deleteBlog, updateBlog, deleteComment } from '../api/api';
 import AllComments from './Allcomments';
+import { motion as m, AnimatePresence } from 'framer-motion';
 
 function SingleBlog({ token }: { token: string | null }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -41,6 +42,7 @@ function SingleBlog({ token }: { token: string | null }) {
   const deletecomment = useMutation({
     mutationFn: (comId: string) => deleteComment(comId, token || ''),
     onMutate: (comId: string) => {
+      const promises = [queryClient.cancelQueries(['blogID', id]), queryClient.getQueryData(['blogID', id])];
       queryClient.setQueryData(['blogID', id], (prevData: any) => {
         if (prevData && prevData.comments) {
           return {
@@ -50,7 +52,7 @@ function SingleBlog({ token }: { token: string | null }) {
         }
         return prevData;
       });
-      return queryClient.getQueryData(['blogID', id]);
+      return Promise.all(promises);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogID', id] });
@@ -59,6 +61,11 @@ function SingleBlog({ token }: { token: string | null }) {
       queryClient.setQueryData(['blogID', id], rollbackData);
     },
   });
+  const CustomAnimation = {
+    initial: { x: '-100%', backgroundColor: 'red' },
+    show: { x: '0%', transition: { duration: 0.65, ease: 'easeInOut' }, backgroundColor: '#eee' },
+    exit: { x: '100%', opacity: 0, transition: { duration: 0.6, ease: 'easeInOut' }, backgroundColor: 'red' },
+  };
 
   if (isLoading) return <span className='loading'>Loading...</span>;
   if (isError) {
@@ -66,32 +73,41 @@ function SingleBlog({ token }: { token: string | null }) {
   }
 
   return data && !isEditing ? (
-    <div className='center singleblog'>
-      <h2 className='title'>{data.title}</h2>
-      <p className='blog-Content'>{data.content}</p>
-      <small className='time'>
-        {new Date(data.createdAt).toLocaleDateString('en-gb', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true,
-        })}
-      </small>
-      {token && (
-        <div className='buttons'>
-          <button onClick={() => deleteblog.mutate()} className='delete'>
-            Delete
-          </button>
-          <button onClick={(e) => setIsEditing(!isEditing)}>Edit</button>
-        </div>
-      )}
+    <AnimatePresence>
+      <m.div
+        className='center singleblog'
+        variants={CustomAnimation}
+        initial='initial'
+        animate='show'
+        key={data._id}
+        exit='exit'
+      >
+        <h2 className='title'>{data.title}</h2>
+        <p className='blog-Content'>{data.content}</p>
+        <small className='time'>
+          {new Date(data.createdAt).toLocaleDateString('en-gb', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+          })}
+        </small>
+        {token && (
+          <div className='buttons'>
+            <button onClick={() => deleteblog.mutate()} className='delete'>
+              Delete
+            </button>
+            <button onClick={(e) => setIsEditing(!isEditing)}>Edit</button>
+          </div>
+        )}
 
-      <Comment id={data._id} />
-      <p>Comments</p>
-      <AllComments data={data} token={token} deletecomment={deletecomment.mutate} />
-    </div>
+        <Comment id={data._id} />
+        <p>Comments</p>
+        <AllComments data={data} token={token} deletecomment={deletecomment.mutate} />
+      </m.div>
+    </AnimatePresence>
   ) : (
     <form
       className='createForm'

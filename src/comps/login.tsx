@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from '../api/api';
+import { motion as m } from 'framer-motion';
+import CustomAni from '../ani/framer';
 function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateAction<null>> }) {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState<null | string>(null);
@@ -22,12 +24,16 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
 
   return (
     <>
-      <form
+      <m.form
         method='POST'
         onSubmit={(e) => {
           e.preventDefault(), mutate();
         }}
         className='createForm loading'
+        variants={CustomAni}
+        initial='initial'
+        animate='show'
+        exit='exit'
       >
         <span className='error'>{error}</span>
         <label htmlFor='username'>Username</label>
@@ -50,7 +56,7 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
         />
         <br />
         <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
-      </form>
+      </m.form>
     </>
   );
 }

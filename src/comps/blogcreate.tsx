@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBlog } from '../api/api';
+import { motion as m } from 'framer-motion';
+import CustomAni from '../ani/framer';
 
 function Blogcreate({ token }: { token: string | null }) {
   const [formData, setFormData] = useState({ title: '', content: '' });
@@ -23,13 +25,17 @@ function Blogcreate({ token }: { token: string | null }) {
 
   return (
     <>
-      <form
+      <m.form
         method='POST'
         onSubmit={(e) => {
           e.preventDefault();
           mutate();
         }}
         className='createForm'
+        variants={CustomAni}
+        initial='initial'
+        animate='show'
+        exit='exit'
       >
         <span className='error'>{error}</span>
         <label htmlFor='title'>Title</label>
@@ -50,7 +56,7 @@ function Blogcreate({ token }: { token: string | null }) {
         />
         <br />
         <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
-      </form>
+      </m.form>
     </>
   );
 }

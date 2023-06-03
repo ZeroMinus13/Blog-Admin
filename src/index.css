@@ -6,6 +6,10 @@
   padding: 0;
   box-sizing: border-box;
 }
+body {
+  background-image: linear-gradient(180deg, rgb(237, 237, 230), rgb(203, 203, 217));
+  height: 100vh;
+}
 
 nav {
   display: flex;
@@ -97,6 +101,7 @@ li {
   min-height: 170px;
   box-shadow: 1px 2px 2px #213547;
   border: 2px solid;
+  font-size: 1.1rem;
   border-image-source: linear-gradient(90deg, #213547ed, transparent);
   border-image-slice: 1;
   border-image-outset: 1;
@@ -106,6 +111,9 @@ li {
 .blog-card:hover {
   background-color: #233646;
   color: white;
+  > .title {
+    color: rgb(246, 240, 161);
+  }
 }
 
 label {
@@ -191,11 +199,11 @@ span {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 2em 1fr 2em;
   padding: 0.7em;
-  border: 1px solid darkblue;
-  border-radius: 20px;
+  border-radius: 10px;
   margin: 0 auto;
   max-width: 80vw;
   text-align: center;
+  background-color: white;
 }
 
 .X {

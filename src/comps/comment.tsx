@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { createComment } from '../api/api';
+import { motion as m } from 'framer-motion';
 
 function Comment({ id }: { id: string }) {
   const [formdata, setFormData] = useState({ username: '', content: '' });
@@ -47,9 +48,9 @@ function Comment({ id }: { id: string }) {
           required
         />
         <br />
-        <button type='submit' disabled={isLoading} style={{ marginBottom: '5px' }}>
+        <m.button type='submit' disabled={isLoading} style={{ marginBottom: '5px' }} whileTap={{ scale: 0.9 }}>
           {isLoading ? 'Sending...' : 'Send'}
-        </button>
+        </m.button>
       </form>
     </>
   );
