@@ -40,8 +40,9 @@ function Comment({ id }: { id: string }) {
           required
         />
         <label htmlFor='content'>Comment*</label>
-        <textarea
+        <input
           id='content'
+          type='text'
           onChange={(e) => setFormData({ ...formdata, content: e.target.value })}
           value={formdata.content}
           placeholder='Comment'
