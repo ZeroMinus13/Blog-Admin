@@ -32,12 +32,12 @@ type props = {
   deletecomment: (comId: string) => void;
 };
 
-interface Data {
+type Data = {
   _id: string;
   title: string;
   content: string;
   createdAt: Date;
   comments: { _id: string; username: string; content: string; createdAt: Date }[];
-}
+};
 
 export default AllComments;

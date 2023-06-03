@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createBlog } from '../api/api';
 
 function Blogcreate({ token }: { token: string | null }) {
   const [formData, setFormData] = useState({ title: '', content: '' });
   const [error, setError] = useState('');
   let navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  async function submitData(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    try {
-      const response = await fetch('https://blog-backend-production-8b95.up.railway.app/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        navigate('/');
-      } else {
-        const errorResponse = await response.json();
-        setError(errorResponse.error);
-      }
-    } catch (err) {
-      console.log(err);
-      setError('Error Occurred');
-    }
-  }
+  const { mutate, isLoading } = useMutation({
+    mutationFn: () => createBlog({ title: formData.title.trim(), content: formData.content.trim() }, token || ''),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogID'] });
+      setFormData({ title: '', content: '' });
+      navigate('/');
+    },
+    onError: (error) => {
+      setError(error instanceof Error ? 'Error: ' + error.message : 'An error occurred');
+    },
+  });
 
   return (
     <>
-      <form method='POST' onSubmit={submitData} className='createForm'>
+      <form
+        method='POST'
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutate();
+        }}
+        className='createForm'
+      >
         <span className='error'>{error}</span>
         <label htmlFor='title'>Title</label>
         <input
@@ -50,7 +49,7 @@ function Blogcreate({ token }: { token: string | null }) {
           placeholder='Content'
         />
         <br />
-        <button>Submit</button>
+        <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
       </form>
     </>
   );

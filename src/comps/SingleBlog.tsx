@@ -67,9 +67,9 @@ function SingleBlog({ token }: { token: string | null }) {
 
   return data && !isEditing ? (
     <div className='center singleblog'>
-      <h2>{data.title}</h2>
-      <p>{data.content}</p>
-      <p>
+      <h2 className='title'>{data.title}</h2>
+      <p className='blog-Content'>{data.content}</p>
+      <small className='time'>
         {new Date(data.createdAt).toLocaleDateString('en-gb', {
           year: 'numeric',
           month: 'short',
@@ -78,7 +78,7 @@ function SingleBlog({ token }: { token: string | null }) {
           minute: '2-digit',
           hour12: true,
         })}
-      </p>
+      </small>
       {token && (
         <div className='buttons'>
           <button onClick={() => deleteblog.mutate()} className='delete'>
@@ -88,8 +88,8 @@ function SingleBlog({ token }: { token: string | null }) {
         </div>
       )}
 
-      <p>Comments</p>
       <Comment id={data._id} />
+      <p>Comments</p>
       <AllComments data={data} token={token} deletecomment={deletecomment.mutate} />
     </div>
   ) : (

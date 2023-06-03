@@ -14,13 +14,13 @@ function Blogs() {
 
   return (
     <>
-      <div className='blog-container'>
+      <ul className='blog-container'>
         {data.map((blog: Blog) => (
           <Link to={blog._id} key={blog._id}>
-            <div className='blog-card'>
-              <h2>{blog.title}</h2>
-              <p>{blog.content.substring(0, 200)}...</p>
-              <p>
+            <li className='blog-card'>
+              <h2 className='title'>{blog.title}</h2>
+              <p className='blog-Content'>{blog.content.substring(0, 170)}...</p>
+              <p className='time'>
                 {new Date(blog.createdAt).toLocaleDateString('en-gb', {
                   year: 'numeric',
                   month: 'short',
@@ -30,10 +30,10 @@ function Blogs() {
                   hour12: true,
                 })}
               </p>
-            </div>
+            </li>
           </Link>
         ))}
-      </div>
+      </ul>
     </>
   );
 }

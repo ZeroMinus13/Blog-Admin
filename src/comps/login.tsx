@@ -7,7 +7,7 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
   const [error, setError] = useState<null | string>(null);
   let navigate = useNavigate();
 
-  const { mutate } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: () => signIn(formData),
     onSuccess: () => {
       let userData = localStorage.getItem('user');
@@ -34,7 +34,7 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
         <input
           type='text'
           id='username'
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, username: e.target.value.trim().replace(/[^a-zA-Z0-9]/g, '') })}
           value={formData.username}
           placeholder='Username'
         />
@@ -43,13 +43,13 @@ function Login({ setUserName }: { setUserName: React.Dispatch<React.SetStateActi
         <input
           type='password'
           id='content'
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value.trim().replace(/[^a-zA-Z0-9]/g, '') })}
           value={formData.password}
           placeholder='Comment'
           autoComplete='password'
         />
         <br />
-        <button>Send</button>
+        <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
       </form>
     </>
   );

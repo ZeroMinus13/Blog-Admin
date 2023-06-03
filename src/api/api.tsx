@@ -82,6 +82,9 @@ async function signIn(formData: { username: string; password: string }) {
 }
 
 async function createAdmin(formData: { username: string; password: string }) {
+  if (formData.username.length < 3 || formData.password.length < 3) {
+    throw new Error('Username and password must be at least 3 characters long.');
+  }
   const response = await fetch('https://blog-backend-production-8b95.up.railway.app/createAdmin', {
     method: 'POST',
     headers: {
@@ -89,5 +92,25 @@ async function createAdmin(formData: { username: string; password: string }) {
     },
     body: JSON.stringify(formData),
   });
+  if (!response.ok) {
+    await error(response);
+  }
 }
-export { createComment, deleteBlog, updateBlog, deleteComment, signIn, createAdmin };
+async function createBlog(formData: { title: string; content: string }, token: string) {
+  if (!token) {
+    throw new Error('Need to be logged in.');
+  }
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(formData),
+  });
+  if (!response.ok) {
+    await error(response);
+  }
+}
+
+export { createComment, deleteBlog, updateBlog, deleteComment, signIn, createAdmin, createBlog };

@@ -7,7 +7,7 @@ function Signup() {
   const [error, setError] = useState<null | string>(null);
   const navigate = useNavigate();
 
-  const { mutate } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: () => createAdmin(admin),
     onSuccess: () => {
       navigate('/');
@@ -29,7 +29,7 @@ function Signup() {
       <input
         type='text'
         id='admin'
-        onChange={(e) => setAdmin({ ...admin, username: e.target.value })}
+        onChange={(e) => setAdmin({ ...admin, username: e.target.value.trim().replace(/[^a-zA-Z0-9]/g, '') })}
         value={admin.username.toLowerCase()}
         placeholder='Admin Username'
         required
@@ -40,14 +40,14 @@ function Signup() {
       <input
         type='password'
         id='password'
-        onChange={(e) => setAdmin({ ...admin, password: e.target.value })}
+        onChange={(e) => setAdmin({ ...admin, password: e.target.value.trim().replace(/[^a-zA-Z0-9]/g, '') })}
         value={admin.password.toLowerCase()}
         placeholder='Password'
         required
         minLength={3}
       />
       <br />
-      <button>Submit</button>
+      <button disabled={isLoading}>{isLoading ? 'Sending' : 'Send'}</button>
     </form>
   );
 }

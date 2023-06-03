@@ -22,8 +22,9 @@ nav a {
   color: #ddd;
   text-decoration: inherit;
   text-align: center;
-  padding: 0.9rem;
+  padding: 1rem;
   font-weight: bold;
+  transition: background-color 0.4s ease-in-out;
 }
 
 nav a:hover {
@@ -54,6 +55,7 @@ button {
   background-color: #213547;
   color: #ddd;
   cursor: pointer;
+  transition: border-radius 0.4s ease-in-out;
 }
 
 button:disabled {
@@ -98,14 +100,14 @@ li {
   border-image-source: linear-gradient(90deg, #213547ed, transparent);
   border-image-slice: 1;
   border-image-outset: 1;
-  transition: transform 0.1s ease-in-out;
-  will-change: transform;
+  transition: background-color 0.3s ease-in-out;
 }
 
 .blog-card:hover {
   background-color: #233646;
   color: white;
 }
+
 label {
   font-weight: bold;
   font-size: 1.2rem;
@@ -201,20 +203,22 @@ span {
   color: rgb(241, 141, 141);
   font-size: 1.1rem;
   grid-column-end: -1;
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .X:hover {
   background-color: transparent;
+  transform: scale(1.2);
   color: red;
-  animation: scale-up 0.5s ease-in-out forwards;
 }
 
 .time {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-align: center;
   font-style: italic;
   grid-column: 2 / 3;
   padding: 1em;
+  color: #c17a28;
 }
 .user {
   display: flex;
@@ -234,11 +238,12 @@ span {
   justify-content: space-around;
 }
 
-@keyframes scale-up {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.2);
-  }
+.title {
+  padding: 0.5rem;
+  font-weight: bolder;
+  color: rgb(65, 132, 219);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.blog-Content {
+  font-family: Arial, Helvetica, sans-serif;
 }
