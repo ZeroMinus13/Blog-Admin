@@ -19,22 +19,24 @@ function Blogs() {
       <AnimatePresence>
         <m.ul className='blog-container' variants={CustomAni} initial='initial' animate='show' exit='exit'>
           {data.map((blog: Blog) => (
-            <Link to={blog._id} key={blog._id}>
-              <li className='blog-card'>
-                <h2 className='title'>{blog.title}</h2>
-                <p className='blog-Content'>{blog.content.substring(0, 170)}...</p>
-                <p className='time'>
-                  {new Date(blog.createdAt).toLocaleDateString('en-gb', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                  })}
-                </p>
-              </li>
-            </Link>
+            <li key={blog._id}>
+              <Link to={blog._id}>
+                <div className='blog-card'>
+                  <h2 className='title'>{blog.title}</h2>
+                  <p className='blog-Content'>{blog.content.substring(0, 170)}...</p>
+                  <p className='time'>
+                    {new Date(blog.createdAt).toLocaleDateString('en-gb', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </p>
+                </div>
+              </Link>
+            </li>
           ))}
         </m.ul>{' '}
       </AnimatePresence>

@@ -107,7 +107,6 @@ li {
 .blog-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  margin: auto 0;
   gap: 2em;
   padding: 2em;
   text-align: center;
